@@ -12,7 +12,7 @@ def parseData(data,outerSplitStr=' | ',innerSplitStr=':'):
             for element in splittedLine:
                 valueStr=element.split(innerSplitStr)
                 try:
-                    x=float(valueStr[-1])
+                    x=float(valueStr[-1].replace(',','.'))
                     dataVect.append(x)
                     
                 except ValueError:
