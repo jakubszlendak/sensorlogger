@@ -18,6 +18,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,6 +45,8 @@ public class MainActivity extends ActionBarActivity {
 	private int portNumber=8888;
 	private String data;
 	private ClientThread cThread;
+	private long timeStart;
+	private float time;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +72,7 @@ public class MainActivity extends ActionBarActivity {
 	
 	protected void onResume(){
 		super.onResume();
+		timeStart=SystemClock.elapsedRealtime();
 		sensorManager.registerListener(accelerationListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 		sensorManager.registerListener(lightListener, light, SensorManager.SENSOR_DELAY_NORMAL);
 		sensorManager.registerListener(giroListener, giro, SensorManager.SENSOR_DELAY_NORMAL);
@@ -201,17 +205,17 @@ public class MainActivity extends ActionBarActivity {
 	};
 	
 	private void refreshDisplay(){
-		
+		time=(SystemClock.elapsedRealtime()-timeStart)/1000;
 		
 		if(accelerometer==null)
 			accelTextView.setText("Not avaliable");
 		else{
-			String accelOutput = String.format("X:%3.2f | Y:%3.2f | Z:%3.2f", x, y, z);
+			String accelOutput = String.format("X:%3.2f | Y:%3.2f | Z:%3.2f | T:%3.2f", x, y, z, time);
 			accelTextView.setText(accelOutput);
 			if(cThread!=null)
 				cThread.setData(accelOutput);
 		}
-		
+																																																
 		if(light==null)
 			lightTextView.setText("Not avaliable");
 		else{

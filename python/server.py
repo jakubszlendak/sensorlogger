@@ -7,17 +7,17 @@ from matplotlib import pyplot as plt
 class AnalogData:
 #class to store points in buffered queue
     #constr
-    def __init__(self,maxlLen):
-        self.x = deque([0.0]*maxLen)
-        self.y = deque([0.0]*maxLen)
-        self.maxLen = maxLen
+    def __init__(self):
+        self.x = deque([0.0])
+        self.y = deque([0.0])
+        
     def addToBuf(self,data,buffer):
         buffer.extend(data)
         
-    def add(self,dataX,dataY,bufferX,bufferY):
+    def add(self,dataX,dataY):
         assert(len(dataX)==len(dataY))
-        addToBuf(dataX,self.x)
-        addToBuf(dataY,self.y)
+        self.addToBuf(dataX,self.x)
+        self.addToBuf(dataY,self.y)
         
     def flush(self):
         self.x.clear()
@@ -38,13 +38,13 @@ class AnalogPlot:
         data.flush()
         plt.draw()
 
-def parseData(data,outerSplitStr=' | ',innerSplitStr=':'):
+def parseData(data,dataVectLen,outerSplitStr=' | ',innerSplitStr=':'):
     lines=data.splitlines()
     parsedData = []
     for line in lines:
         dataVect = []
         splittedLine = line.split(outerSplitStr)
-        if (len(splittedLine)==3):
+        if (len(splittedLine)==dataVectLen):
             for element in splittedLine:
                 valueStr=element.split(innerSplitStr)
                 try:
@@ -67,14 +67,20 @@ s.listen(backlog)
 client,addres = s.accept()
 file = open("sensorlogger.txt", "w")
 
+plotData = AnalogData()
+plotData.add([0],[0])
+plot = AnalogPlot(plotData)
 
 try:
     while(True):
         data=client.recv(size)
+       # print(data)
         dataDecoded = data.decode()
         file.write(dataDecoded+'\n')
-        print(parseData(dataDecoded))
-        #print(values)
+        downloadedData=parseData(dataDecoded,4)
+        print(downloadedData)
+      #  plotData.add(downloadedData)
+       # plot.update(plotData)
         sleep(0.03)
     client.close()
 
