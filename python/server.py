@@ -27,14 +27,15 @@ class AnalogData:
 class AnalogPlot:
     def __init__(self, data):
         plt.ion()
-        self.xline, =plt.plot(data.x)
-        self.yline, =plt.plot(data.y)
+        self.xline, =plt.plot(data.x,data.y)
+        #self.yline, =plt.plot(data.y)
         data.flush()
-        #plt.ylim([0,12])
+        plt.ylim([0,12])
 
     def update(self,data):
         self.xline.set_ydata(data.x)
-        self.yline.set_ydata(data.y)
+        self.xline.set_xdata(data.y)
+       # self.yline.set_xdata(data.y)
         data.flush()
         plt.draw()
 
@@ -66,28 +67,41 @@ s.bind((host,port))
 s.listen(backlog)
 client,addres = s.accept()
 file = open("sensorlogger.txt", "w")
+file2 = open("dataoutput.txt","w")
 
 plotData = AnalogData()
 plotData.add([0],[0])
 plot = AnalogPlot(plotData)
+jebutnyWektorDanych = []
 
 try:
     while(True):
         data=client.recv(size)
-       # print(data)
+       #print(data)
         dataDecoded = data.decode()
         file.write(dataDecoded+'\n')
         downloadedData=parseData(dataDecoded,4)
-        print(downloadedData)
-      #  plotData.add(downloadedData)
-       # plot.update(plotData)
+        #print(downloadedData)
+        #plotData.add(downloadedData[0],downloadedData[-1])
+        #plot.update(plotData)
+        jebutnyWektorDanych.extend(downloadedData)
+        #file2.write(str(downloadedData[-1]) + ' ' + str(downloadedData[0])+'\n')
         sleep(0.03)
+        
     client.close()
+
 
 except KeyboardInterrupt:
     client.close()
     print("bye")
-file.close()    
+
+for each_element in jebutnyWektorDanych:
+    print(str(each_element[-1]) + ' ' + str(each_element[0]))
+    file2.write(str(each_element[-1]) + ' ' + str(each_element[0])+'\n')
+
+
+file.close()
+file2.close()
         
 
 

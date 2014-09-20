@@ -205,7 +205,7 @@ public class MainActivity extends ActionBarActivity {
 	};
 	
 	private void refreshDisplay(){
-		time=(SystemClock.elapsedRealtime()-timeStart)/1000;
+		time=((float)(SystemClock.elapsedRealtime())-timeStart)/1000;
 		
 		if(accelerometer==null)
 			accelTextView.setText("Not avaliable");
